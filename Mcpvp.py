@@ -6,8 +6,11 @@ st.set_page_config(page_title="Minecraft PvP Strategy Simulator", layout="center
 st.title("🗡️ Minecraft PvP Strategy Simulator")
 
 # Dropdowns and Sliders 
-
-health = st.selectbox("Player Health", ["High", "Low"]) cps = st.selectbox("CPS (Clicks per Second)", ["High (15-20)", "Low (5-10)"]) gamesense = st.selectbox("Game Sense", ["High", "Medium", "Low"]) playstyle = st.selectbox("Playstyle", ["Aggressive", "Defensive", "Balanced"]) tactic = st.selectbox("Tactic Used", ["Web", "Short Pearl", "Medium Pearl", "Long Pearl", "Totem", "Gap"])
+health = st.selectbox("Player Health", ["High", "Low"])
+cps = st.selectbox("CPS (Clicks per Second)", ["High (15-20)", "Low (5-10)"])
+gamesense = st.selectbox("Game Sense", ["High", "Medium", "Low"])
+playstyle = st.selectbox("Playstyle", ["Aggressive", "Defensive", "Balanced"])
+tactic = st.selectbox("Tactic Used", ["Web", "Short Pearl", "Medium Pearl", "Long Pearl", "Totem", "Gap"])
 
 # --- Simulated Rules Based on User Input ---
 
