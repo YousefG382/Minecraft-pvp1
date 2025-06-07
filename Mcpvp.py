@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.set_page_config(page_title="Minecraft PvP Strategy Simulator", layout="centered") st.title("🗡️ Minecraft PvP Strategy Simulator")
+st.set_page_config(page_title="Minecraft PvP Strategy Simulator", layout="centered")
+st.title("🗡️ Minecraft PvP Strategy Simulator")
 
 --- Dropdowns and Sliders ---
 
