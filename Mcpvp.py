@@ -2,90 +2,86 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
+# Page config
 st.set_page_config(page_title="Minecraft PvP Strategy Simulator", layout="centered")
 st.title("🗡️ Minecraft PvP Strategy Simulator")
 
-# Dropdowns and Sliders 
+# --- Dropdowns and Sliders ---
 health = st.selectbox("Player Health", ["High", "Low"])
 cps = st.selectbox("CPS (Clicks per Second)", ["High (15-20)", "Low (5-10)"])
 gamesense = st.selectbox("Game Sense", ["High", "Medium", "Low"])
 playstyle = st.selectbox("Playstyle", ["Aggressive", "Defensive", "Balanced"])
 tactic = st.selectbox("Tactic Used", ["Web", "Short Pearl", "Medium Pearl", "Long Pearl", "Totem", "Gap"])
 
-# --- Simulated Rules Based on User Input ---
+# --- Strategy Evaluation Logic ---
+def evaluate_strategy(health, cps, gamesense, playstyle, tactic):
+    # Initial base score
+    score = 50
 
-def calculate_success_rate(health, cps, gamesense, playstyle, tactic): # Initialize a base rate rate = 50
+    # Modify score based on tactic interactions
+    if tactic == "Web":
+        if playstyle == "Aggressive":
+            score += 20
+        if cps == "High (15-20)" and gamesense == "High":
+            score -= 30
+        if tactic == "Web" and health == "Low":
+            score -= 10
 
-if tactic == "Web":
-    if playstyle == "Aggressive":
-        rate += 20
-    if cps.startswith("High") and gamesense == "High":
-        rate -= 30
+    elif tactic == "Short Pearl":
+        score += 15
+        if playstyle == "Aggressive":
+            score += 10
+        if gamesense == "Low":
+            score += 5
 
-elif tactic == "Long Pearl":
-    if health == "High":
-        if cps.startswith("High") and gamesense == "High":
-            rate = 30
+    elif tactic == "Medium Pearl":
+        if cps == "Low (5-10)":
+            score += 10
+        if gamesense == "High" and cps == "High (15-20)":
+            score -= 25
+
+    elif tactic == "Long Pearl":
+        if gamesense == "High" and cps == "High (15-20)":
+            score -= 20
+        elif health == "High":
+            score += 10
         else:
-            rate = 70
-    else:
-        if cps.startswith("High") and gamesense == "High":
-            rate = 20
-        else:
-            rate = 40
+            score -= 10
 
-elif tactic == "Medium Pearl":
-    if health == "High":
-        if gamesense == "High" and cps.startswith("High"):
-            rate = 30
-        else:
-            rate = 75
-    else:
-        if gamesense == "High":
-            rate = 25
-        else:
-            rate = 80
+    elif tactic == "Totem":
+        score += 5
 
-elif tactic == "Short Pearl":
-    if playstyle == "Defensive":
-        rate = 65
-    elif playstyle == "Aggressive":
-        rate = 80
+    elif tactic == "Gap":
+        if tactic == "Gap" and playstyle == "Aggressive":
+            score += 10
 
-elif tactic == "Gap":
-    if gamesense == "High":
-        rate = 85
-    else:
-        rate = 60
+    # Modify score by playstyle matchups
+    if playstyle == "Aggressive" and cps == "High (15-20)" and gamesense == "Low":
+        score += 5
+    if playstyle == "Defensive" and cps == "Low (5-10)" and gamesense == "High":
+        score += 15
+    if playstyle == "Balanced":
+        score += 5
 
-elif tactic == "Totem":
-    rate = 50  # Neutral outcome in most cases
+    # Clamp score between 0 and 100
+    score = max(0, min(score, 100))
+    return score
 
-# Add modifiers
-if playstyle == "Defensive" and tactic == "Web":
-    rate += 10
-if cps.startswith("High"):
-    rate += 5
-if gamesense == "High":
-    rate += 5
-if health == "Low":
-    rate -= 10
+# --- Output ---
+success_rate = evaluate_strategy(health, cps, gamesense, playstyle, tactic)
+st.metric(label="Success Rate", value=f"{success_rate} %")
 
-return min(max(rate, 0), 100)  # Clamp to 0-100
+# Optional: Show result as bar chart
+chart_data = pd.DataFrame({
+    'Strategy': ['Your Setup'],
+    'Success Rate': [success_rate]
+})
 
-# --- Calculate ---
-
-success_rate = calculate_success_rate(health, cps, gamesense, playstyle, tactic)
-
-st.markdown(f"### 📊 Success Rate of Selected Strategy: {success_rate}%")
-
-# --- Graph ---
-
-data = pd.DataFrame({ 'Strategy': ["Your Selection", "Average"], 'Success Rate': [success_rate, 50] })
-
-chart = alt.Chart(data).mark_bar().encode( x='Strategy', y='Success Rate', color=alt.condition( alt.datum.Strategy == "Your Selection", alt.value('green'), alt.value('gray') ) ).properties( width=400, height=300 )
-
-st.altair_chart(chart, use_container_width=True)
-
-st.caption("This simulator is based on hypothetical data and in-game PvP logic provided by the community. Not tied to Mojang or Microsoft.")
-
+st.altair_chart(
+    alt.Chart(chart_data).mark_bar().encode(
+        x='Strategy',
+        y='Success Rate',
+        color=alt.value('steelblue')
+    ).properties(width=400, height=300),
+    use_container_width=True
+)
